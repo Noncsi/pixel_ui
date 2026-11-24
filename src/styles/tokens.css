@@ -1,0 +1,79 @@
+/*
+ * Pixel UI design tokens.
+ *
+ * Every component reads these custom properties (with a built-in fallback),
+ * so a game re-themes the whole kit by overriding them on :root or on any
+ * container. Dark is the default — most games are dark — and light is opt-in
+ * with data-theme="light".
+ */
+
+:root {
+  /* Palette */
+  --px-color-bg: #1a1c2c;
+  --px-color-surface: #333c57;
+  --px-color-border: #0b0c14;
+  --px-color-text: #f4f4f4;
+  --px-color-text-muted: #94b0c2;
+
+  --px-color-health: #38b764;
+  --px-color-mana: #41a6f6;
+  --px-color-xp: #ffcd75;
+  --px-color-danger: #b13e53;
+  /* Warning is its own colour, not a weaker danger: "you are low on
+     potions" and "you are about to die" are different messages. It is the
+     one accent light enough to need dark text, and the only one whose
+     brightness flips between the themes, so it carries its own pair. */
+  --px-color-warning: #ffcd75;
+  --px-color-text-on-warning: #0b0c14;
+  --px-color-damage: #f4f4f4;
+  /* Sits on --px-color-danger, which is the same in both themes. */
+  --px-color-text-on-danger: #f4f4f4;
+
+  /* For text drawn on the border colour, which is dark in both themes:
+     an item count over its sprite, say. */
+  --px-color-text-on-dark: #f4f4f4;
+
+  /* Positive and "on" states. Kept apart from --px-color-health so a game
+     can re-colour its bars without re-colouring its switches. */
+  --px-color-accent: #38b764;
+
+  /* The "this one is picked" colour: the active menu row, the speaker's
+     name, every focus ring. Gold reads on the dark theme and vanishes on
+     the light one, so this is a token of its own rather than --px-color-xp. */
+  --px-color-highlight: #ffcd75;
+
+  /* Pixel geometry */
+  --px-unit: 4px; /* one "art pixel" */
+  --px-border-width: calc(var(--px-unit) * 1);
+
+  /* Type */
+  --px-font-family: 'Press Start 2P', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --px-font-size-sm: 8px;
+  --px-font-size-md: 12px;
+
+  /* Motion */
+  --px-duration-fast: 120ms;
+  --px-duration-slow: 600ms;
+}
+
+[data-theme='light'] {
+  --px-color-bg: #f4f4f4;
+  --px-color-surface: #c2c3c7;
+  --px-color-border: #1a1c2c;
+  --px-color-text: #1a1c2c;
+  --px-color-text-muted: #566c86;
+  --px-color-damage: #1a1c2c;
+  --px-color-highlight: #5d275d;
+  /* Gold on a pale panel is barely there, so the light theme takes a burnt
+     orange instead — the same move --px-color-highlight makes. Dark enough
+     that the text on it flips the other way. */
+  --px-color-warning: #7a3a1f;
+  --px-color-text-on-warning: #f4f4f4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --px-duration-fast: 0ms;
+    --px-duration-slow: 0ms;
+  }
+}

@@ -1,0 +1,78 @@
+name: Pages
+
+# The showcase at the root, Storybook one level down:
+#
+#   https://<user>.github.io/<repo>/            the seven example screens
+#   https://<user>.github.io/<repo>/storybook/  every component on its own
+#
+# Both builds already emit relative asset URLs — the site because
+# vite.site.config.ts sets `base: './'`, Storybook because that is what its
+# builder does — so neither needs to be told the repository path it will end
+# up under, and the same output works at a domain root too.
+
+on:
+  push:
+    branches: [main]
+  # So the site can be re-published without a commit to do it with.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and never cancel one half-done: an interrupted
+# publish would leave the live site in whatever state it got to.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # ci.yml runs this too, and it runs here as well on purpose: this
+      # workflow is the one that puts something in front of people, and it
+      # should not be able to publish a build that failed its own tests.
+      - run: npm run check
+
+      - run: npm run build:site
+      - run: npm run build-storybook
+
+      - name: Put Storybook under the showcase
+        run: |
+          mkdir -p dist-site/storybook
+          cp -r storybook-static/. dist-site/storybook/
+
+      # No `enablement: true`. Creating a Pages site is a repository-admin
+      # operation, and GITHUB_TOKEN is not an administrator however the
+      # permissions above are written — asking for it fails the whole build
+      # with "Resource not accessible by integration". Pages is switched on
+      # once per repository from the outside — in Settings, or with
+      # `gh api repos/<user>/<repo>/pages -X POST -f build_type=workflow`,
+      # which runs as a user token and so is an administrator. This step only
+      # reads the configuration that produces.
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist-site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v5

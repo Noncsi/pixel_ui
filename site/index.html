@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pixel UI — a pixel-art game UI kit in Web Components</title>
+    <meta
+      name="description"
+      content="Forty-one framework-agnostic custom elements for pixel-art game interfaces, shown as the screens a game would actually build with them."
+    />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <!-- tokens.css is imported from main.ts, not linked: it lives outside
+         this build's root, and a <link> to it is served as a JavaScript
+         module, which the browser accepts as a stylesheet with no rules in
+         it. Everything would still look nearly right, on the components'
+         own fallbacks, and nothing would theme. -->
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#screen">Skip to the screen</a>
+
+    <header class="site-header">
+      <div class="shell header-inner">
+        <div class="brand">
+          <h1>Pixel&nbsp;UI</h1>
+          <p>A pixel-art game UI kit, built as framework-agnostic Web Components.</p>
+        </div>
+        <div class="header-actions">
+          <!-- href is set from main.ts: Storybook is a sibling of this site
+               once both are deployed, and its own dev server before that. -->
+          <a id="storybook" class="chip-button" href="./storybook/">
+            <span aria-hidden="true">▤</span>
+            <span>Storybook</span>
+          </a>
+          <!-- href is set from main.ts, from the one place the URL is kept. -->
+          <a id="source" class="chip-button" href="#" rel="noreferrer">
+            <span aria-hidden="true">◧</span>
+            <span>Source</span>
+          </a>
+          <button id="theme" type="button" class="chip-button" aria-pressed="false">
+            <span aria-hidden="true">◐</span>
+            <span id="theme-label">Light theme</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="shell layout">
+      <nav class="rail" aria-label="Example screens">
+        <p class="rail-title">Screens</p>
+        <ul id="nav"></ul>
+        <p class="rail-note">
+          Each screen is built from the kit and nothing else. The chips under it name every
+          component it uses.
+        </p>
+      </nav>
+
+      <div class="stage">
+        <section id="screen" aria-live="polite" tabindex="-1">
+          <header class="stage-head">
+            <h2 id="screen-name"></h2>
+            <p id="screen-caption"></p>
+          </header>
+          <div class="viewport"><div id="scene" class="scene"></div></div>
+          <footer class="stage-foot">
+            <p class="uses-title">Components on this screen</p>
+            <ul id="uses" class="uses"></ul>
+          </footer>
+        </section>
+      </div>
+    </main>
+
+    <section class="shell catalogue" aria-labelledby="catalogue-title">
+      <h2 id="catalogue-title">Every component</h2>
+      <p class="catalogue-lead">
+        Thirty-four components, forty-one custom elements. Each one wraps the platform rather than
+        reimplementing it, carries its own accessible name and keyboard behaviour, and is themed
+        entirely through <code>--px-*</code> custom properties.
+      </p>
+      <ul id="catalogue" class="catalogue-grid"></ul>
+    </section>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <p>
+          Built with Lit 3 and no framework. Tested with Vitest and happy-dom, documented in
+          Storybook, themed with CSS custom properties in two themes.
+        </p>
+        <p class="footer-meta">
+          <span id="stat-components"></span> · <span id="stat-tests"></span> ·
+          <span id="stat-size"></span>
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

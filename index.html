@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pixel UI playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/tokens.css" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: var(--px-color-bg);
+        color: var(--px-color-text);
+        font-family: var(--px-font-family);
+      }
+      main {
+        width: min(360px, calc(100vw - 32px));
+        display: grid;
+        gap: 20px;
+      }
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+      h2 {
+        font-size: 8px;
+        margin: 12px 0 0;
+        color: var(--px-color-text-muted);
+        text-transform: uppercase;
+      }
+      /* Spelled out, because `display: flex` would otherwise beat the user
+         agent's rule for [hidden] and the row would never hide. */
+      #loading-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 8px;
+      }
+      #loading-row[hidden] {
+        display: none;
+      }
+    </style>
+    <script type="module" src="/src/index.ts"></script>
+  </head>
+  <body>
+    <main>
+      <h1 style="font-size: 12px">Pixel UI</h1>
+      <px-health-bar id="hp" label="HP" value="80" segments="10" show-value></px-health-bar>
+      <px-health-bar label="Mana" variant="mana" value="45" show-value></px-health-bar>
+      <px-health-bar label="XP" variant="xp" value="320" max="500" show-value></px-health-bar>
+      <div class="buttons">
+        <px-button size="sm" data-delta="-15" variant="danger">Hit (-15)</px-button>
+        <px-button size="sm" data-delta="20">Heal (+20)</px-button>
+        <px-button size="sm" id="theme" variant="secondary">Theme</px-button>
+      </div>
+      <output id="log" style="font-size: 8px; min-height: 1em"></output>
+
+      <h2>Buttons</h2>
+      <div class="buttons">
+        <px-button>Start game</px-button>
+        <px-button variant="secondary">Options</px-button>
+        <px-button variant="danger">Quit</px-button>
+      </div>
+      <div class="buttons">
+        <px-button size="sm" toggle id="sound">Sound</px-button>
+        <px-button size="sm" disabled>Continue</px-button>
+        <px-button size="sm">
+          <svg slot="icon" viewBox="0 0 8 8" width="8" height="8" fill="currentColor">
+            <path
+              d="M1 0h1v1H1zM2 1h1v1H2zM3 2h1v1H3zM4 3h1v1H4zM3 4h1v1H3zM2 5h1v1H2zM1 6h1v1H1z"
+            />
+          </svg>
+          Next
+        </px-button>
+      </div>
+      <px-button full-width>New game</px-button>
+
+      <h2>Dialogue</h2>
+      <px-dialogue-box id="dialogue" speaker="Old man">
+        <svg slot="portrait" viewBox="0 0 8 8" shape-rendering="crispEdges">
+          <rect width="8" height="8" fill="#1a1c2c" />
+          <rect x="1" y="1" width="6" height="6" fill="#94b0c2" />
+          <rect x="1" y="1" width="6" height="2" fill="#f4f4f4" />
+          <rect x="2" y="4" width="1" height="1" fill="#1a1c2c" />
+          <rect x="5" y="4" width="1" height="1" fill="#1a1c2c" />
+          <rect x="3" y="6" width="2" height="1" fill="#1a1c2c" />
+        </svg>
+      </px-dialogue-box>
+
+      <h2>Menu</h2>
+      <px-menu id="pause" label="Paused">
+        <px-menu-item>Continue</px-menu-item>
+        <px-menu-item>Load game</px-menu-item>
+        <px-menu-item>
+          Difficulty
+          <span slot="detail" id="difficulty">normal</span>
+        </px-menu-item>
+        <px-menu-item disabled>
+          Cheats
+          <span slot="detail">locked</span>
+        </px-menu-item>
+        <px-menu-item value="quit">Quit</px-menu-item>
+      </px-menu>
+
+      <h2>Options</h2>
+      <px-toggle id="sound-switch" label="Sound" checked></px-toggle>
+      <px-slider id="music" label="Music" value="80" unit="%" show-value></px-slider>
+
+      <h2>Tabs</h2>
+      <px-tabs id="sheet">
+        <px-tab panel="items">Items</px-tab>
+        <px-tab panel="gear">
+          Gear
+          <px-badge variant="accent" label="1 new item">New</px-badge>
+        </px-tab>
+        <px-tab panel="magic" disabled>Magic</px-tab>
+
+        <px-tab-panel name="items">Potion ×12, Antidote ×3, a suspicious mushroom.</px-tab-panel>
+        <px-tab-panel name="gear">Rusty Sword, Wooden Shield, one boot.</px-tab-panel>
+        <px-tab-panel name="magic">You haven't learned any spells.</px-tab-panel>
+      </px-tabs>
+
+      <h2>Tooltip and toasts</h2>
+      <div class="buttons">
+        <px-tooltip text="Restores 20 HP" placement="top">
+          <px-button size="sm" id="potion">Use potion</px-button>
+        </px-tooltip>
+        <px-button size="sm" variant="secondary" id="save">Save</px-button>
+        <px-button size="sm" variant="danger" id="die">Die</px-button>
+      </div>
+
+      <h2>Inventory</h2>
+      <px-inventory-grid id="bag" label="Bag" columns="5">
+        <px-inventory-slot label="Potion" count="12">
+          <svg viewBox="0 0 8 8" fill="#38b764"><path d="M3 0h2v2H3zM2 2h4v6H2z" /></svg>
+        </px-inventory-slot>
+        <px-inventory-slot label="Rusty Sword">
+          <svg viewBox="0 0 8 8" fill="#94b0c2">
+            <path d="M3 0h2v5H3zM2 5h4v1H2zM3 6h2v2H3z" />
+          </svg>
+        </px-inventory-slot>
+        <px-inventory-slot label="Wooden Shield">
+          <svg viewBox="0 0 8 8" fill="#41a6f6">
+            <path d="M1 1h6v1H1zM1 2h1v4H1zM6 2h1v4H6zM2 6h4v1H2z" />
+          </svg>
+        </px-inventory-slot>
+        <px-inventory-slot label="Rusty Key" count="3">
+          <svg viewBox="0 0 8 8" fill="#ffcd75">
+            <path d="M1 1h3v3H1zM4 2h3v1H4zM6 3h1v2H6z" />
+          </svg>
+        </px-inventory-slot>
+        <px-inventory-slot></px-inventory-slot>
+        <px-inventory-slot></px-inventory-slot>
+        <px-inventory-slot></px-inventory-slot>
+        <px-inventory-slot></px-inventory-slot>
+        <px-inventory-slot disabled></px-inventory-slot>
+        <px-inventory-slot disabled></px-inventory-slot>
+      </px-inventory-grid>
+
+      <h2>Dropdown and dialog</h2>
+      <div class="buttons">
+        <px-dropdown id="difficulty-select" label="Difficulty" value="normal">
+          <px-option value="easy">Easy</px-option>
+          <px-option value="normal">Normal</px-option>
+          <px-option value="hard">Hard</px-option>
+          <px-option value="nightmare" disabled>Nightmare</px-option>
+        </px-dropdown>
+        <px-button size="sm" variant="danger" id="quit">Quit</px-button>
+      </div>
+
+      <h2>Panel, input and progress</h2>
+      <px-panel label="New game">
+        <div style="display: grid; gap: 12px">
+          <px-input
+            id="player-name"
+            label="Name"
+            maxlength="8"
+            uppercase
+            show-count
+            placeholder="LINK"
+          ></px-input>
+          <px-progress id="loading" label="Loading" value="0" show-value></px-progress>
+        </div>
+        <px-button slot="footer" size="sm" id="start">Start</px-button>
+      </px-panel>
+
+      <h2>Choices, keys and logs</h2>
+      <px-segmented id="speed" label="Text speed" value="normal" full-width>
+        <px-segment value="slow">Slow</px-segment>
+        <px-segment value="normal">Normal</px-segment>
+        <px-segment value="fast">Fast</px-segment>
+      </px-segmented>
+
+      <p style="font-size: 8px; line-height: 2.6; margin: 0">
+        <px-keycap>W</px-keycap><px-keycap>A</px-keycap><px-keycap>S</px-keycap
+        ><px-keycap>D</px-keycap> to move,
+        <px-keycap device="gamepad" label="A button">A</px-keycap> to talk
+      </p>
+
+      <h2>Party and timer</h2>
+      <px-panel label="Boss fight">
+        <div style="display: flex; gap: 12px; align-items: center">
+          <px-avatar id="hero" name="Old Man" size="sm" status="ok" status-label="Healthy">
+          </px-avatar>
+          <px-sprite
+            id="coin"
+            frame-width="16"
+            frame-height="16"
+            frames="6"
+            scale="2"
+            label="A spinning coin"
+          ></px-sprite>
+          <span style="margin-left: auto">
+            <px-timer id="boss" value="15" warn-at="5" label="Enrage in"></px-timer>
+          </span>
+        </div>
+        <px-button slot="footer" size="sm" id="fight">Start fight</px-button>
+      </px-panel>
+
+      <h2>Shop</h2>
+      <px-panel label="General store">
+        <span slot="header">
+          <px-badge variant="xp" label="New stock today">New</px-badge>
+        </span>
+        <div style="display: grid; gap: 12px">
+          <px-number id="buy-potions" label="Potion — 20g" value="1" max="9"></px-number>
+          <px-divider ornament></px-divider>
+          <div style="display: flex; justify-content: space-between; align-items: baseline">
+            <span style="font-size: 8px; text-transform: uppercase">Gold</span>
+            <px-counter id="gold" value="250" separator="," label="Gold"></px-counter>
+          </div>
+        </div>
+        <px-button slot="footer" size="sm" id="buy">Buy</px-button>
+      </px-panel>
+
+      <h2>New game</h2>
+      <px-panel label="Create your character">
+        <div style="display: grid; gap: 16px">
+          <px-input id="hero-name" label="Name" value="Noemi" maxlength="12"></px-input>
+          <px-character-creator id="hero-look" label="Appearance" hair="2" hair-color="6">
+          </px-character-creator>
+        </div>
+        <px-button slot="footer" size="sm" variant="secondary" id="reroll">Surprise me</px-button>
+        <px-button slot="footer" size="sm" id="begin">Begin</px-button>
+      </px-panel>
+
+      <h2>Load game</h2>
+      <px-notice id="save-notice" variant="warning" heading="Older save">
+        Slot 2 is from version 0.8. Loading it will convert it.
+      </px-notice>
+      <div id="slots" style="display: grid; gap: 8px">
+        <px-save-slot
+          slot-number="1"
+          name="Noemi"
+          level="12"
+          location="Dark Forest"
+          playtime="15132"
+          saved="12 Nov, 21:04"
+          selected
+        >
+          <svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <rect x="1" y="1" width="6" height="6" fill="#38b764" />
+            <rect x="2" y="3" width="1" height="1" fill="#0b0c14" />
+            <rect x="5" y="3" width="1" height="1" fill="#0b0c14" />
+            <rect x="2" y="5" width="4" height="1" fill="#0b0c14" />
+          </svg>
+        </px-save-slot>
+        <px-save-slot
+          slot-number="2"
+          name="Noemi"
+          level="4"
+          location="Village well"
+          playtime="2640"
+          saved="9 Nov, 18:22"
+        >
+          <svg viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <rect x="1" y="1" width="6" height="6" fill="#41a6f6" />
+            <rect x="2" y="3" width="1" height="1" fill="#0b0c14" />
+            <rect x="5" y="3" width="1" height="1" fill="#0b0c14" />
+            <rect x="2" y="5" width="4" height="1" fill="#0b0c14" />
+          </svg>
+        </px-save-slot>
+        <px-save-slot slot-number="3" empty></px-save-slot>
+      </div>
+      <div class="buttons">
+        <px-button size="sm" id="load">Load</px-button>
+        <span id="loading-row" hidden>
+          <px-spinner id="load-spinner" style="--px-spinner-size: 16px" label="Loading the save">
+          </px-spinner>
+          <span>Loading…</span>
+        </span>
+      </div>
+      <div id="load-result"></div>
+
+      <h2>Mods and ratings</h2>
+      <div style="display: grid; gap: 8px">
+        <px-collapsible summary="Mods" open>
+          <px-badge slot="aside" id="mod-count" variant="xp" label="Mods on">2</px-badge>
+          <div style="display: grid">
+            <px-checkbox id="mods-all" label="Everything" checked indeterminate></px-checkbox>
+            <div style="padding-left: 16px">
+              <px-checkbox data-mod label="Bigger backpack" checked></px-checkbox>
+              <px-checkbox data-mod label="Fast travel" checked></px-checkbox>
+              <px-checkbox data-mod label="Weather"></px-checkbox>
+              <px-checkbox data-mod label="Permadeath">
+                <span slot="hint">One life. The save file is deleted when you die.</span>
+              </px-checkbox>
+            </div>
+          </div>
+        </px-collapsible>
+        <px-collapsible summary="Rusty sword">
+          <px-rating slot="aside" readonly value="1" shape="diamond" label="Rarity"></px-rating>
+          <div style="display: grid; gap: 12px">
+            <span>A stick, technically. The old man was very insistent.</span>
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <span style="font-size: 8px; text-transform: uppercase">Your rating</span>
+              <px-rating id="sword-rating" value="0" allow-zero label="Your rating"></px-rating>
+            </div>
+          </div>
+        </px-collapsible>
+      </div>
+
+      <h2>Bubble and ticker</h2>
+      <div style="display: grid; gap: 8px; justify-items: center">
+        <px-speech-bubble id="bark" speaker="Old man">
+          It is dangerous to go alone! Take this.
+        </px-speech-bubble>
+        <px-avatar name="Old Man" size="lg"></px-avatar>
+      </div>
+
+      <px-divider label="News"></px-divider>
+      <px-marquee speed="35">
+        ★ NEW HIGH SCORE — 97,500 — NOEMI ★ THE CAVES TO THE NORTH REMAIN UNEXPLORED ★
+      </px-marquee>
+
+      <px-scrollbox id="quest-log" label="Quest log">
+        <p style="margin: 0 0 12px">Left home with a stick.</p>
+        <p style="margin: 0 0 12px">Met an old man who insisted the stick was a weapon.</p>
+      </px-scrollbox>
+    </main>
+
+    <px-toast-stack id="toasts" placement="bottom-right" max="4"></px-toast-stack>
+    <px-dialog id="confirm" label="Really quit?">
+      You have unsaved progress. Everything since the last save will be lost.
+      <px-button slot="footer" size="sm" variant="secondary" data-answer="stay">Stay</px-button>
+      <px-button slot="footer" size="sm" variant="danger" data-answer="quit">Quit</px-button>
+    </px-dialog>
+    <script type="module">
+      const hp = document.getElementById('hp');
+      const log = document.getElementById('log');
+      for (const button of document.querySelectorAll('[data-delta]')) {
+        button.addEventListener('click', () => {
+          hp.value = Math.min(hp.max, Math.max(0, hp.value + Number(button.dataset.delta)));
+        });
+      }
+      document.getElementById('sound').addEventListener('px-toggle', (event) => {
+        log.textContent = `px-toggle: sound ${event.detail.pressed ? 'on' : 'off'}`;
+      });
+      hp.addEventListener('px-low', () => (log.textContent = 'px-low: careful!'));
+      hp.addEventListener('px-depleted', () => (log.textContent = 'px-depleted: game over'));
+      const dialogue = document.getElementById('dialogue');
+      const script = [
+        { speaker: 'Old man', text: 'It is dangerous to go alone! Take this.' },
+        { speaker: 'You', text: '...a stick?' },
+        { speaker: 'Old man', text: 'It is a very good stick. Mind the caves to the north.' },
+      ];
+      let line = 0;
+      const say = (index) => {
+        dialogue.speaker = script[index].speaker;
+        dialogue.text = script[index].text;
+      };
+      say(0);
+      dialogue.addEventListener('px-dialogue-advance', () => {
+        line = (line + 1) % script.length;
+        say(line);
+      });
+      const bark = document.getElementById('bark');
+      dialogue.addEventListener('px-typing-end', (event) => {
+        log.textContent = `px-typing-end: ${event.detail.skipped ? 'skipped' : 'typed out'}`;
+        // The bubble echoes whatever the box just finished saying.
+        bark.speaker = dialogue.speaker;
+        bark.textContent = dialogue.text;
+      });
+
+      const pause = document.getElementById('pause');
+      const difficulties = ['easy', 'normal', 'hard'];
+      const difficulty = document.getElementById('difficulty');
+      pause.addEventListener('px-menu-select', (event) => {
+        // The one row that changes a setting in place instead of going somewhere.
+        if (event.detail.value === 'Difficulty') {
+          const next = (difficulties.indexOf(difficulty.textContent) + 1) % difficulties.length;
+          difficulty.textContent = difficulties[next];
+          return;
+        }
+        log.textContent = `px-menu-select: ${event.detail.value}`;
+      });
+      pause.addEventListener('px-menu-cancel', () => {
+        log.textContent = 'px-menu-cancel: backed out';
+      });
+      document.getElementById('sound-switch').addEventListener('px-toggle-change', (event) => {
+        log.textContent = `px-toggle-change: sound ${event.detail.checked ? 'on' : 'off'}`;
+      });
+      document.getElementById('music').addEventListener('px-slider-change', (event) => {
+        log.textContent = `px-slider-change: music ${event.detail.value}%`;
+      });
+
+      const toasts = document.getElementById('toasts');
+      document.getElementById('potion').addEventListener('click', () => {
+        hp.value = Math.min(hp.max, hp.value + 20);
+        toasts.toast('Potion used: +20 HP', { variant: 'success' });
+      });
+      document.getElementById('save').addEventListener('click', () => {
+        toasts.toast('Game saved');
+      });
+      document.getElementById('die').addEventListener('click', () => {
+        hp.value = 0;
+        toasts.toast('You died. Again.', { variant: 'danger' });
+      });
+      document.getElementById('sheet').addEventListener('px-tab-change', (event) => {
+        log.textContent = `px-tab-change: ${event.detail.name}`;
+      });
+
+      document.getElementById('bag').addEventListener('px-inventory-select', (event) => {
+        if (event.detail.slot.empty) {
+          log.textContent = 'px-inventory-select: nothing in that slot';
+          return;
+        }
+        toasts.toast(`Used ${event.detail.label}`, { variant: 'success' });
+      });
+
+      // The same setting the Difficulty row in the pause menu cycles.
+      document
+        .getElementById('difficulty-select')
+        .addEventListener('px-dropdown-change', (event) => {
+          difficulty.textContent = event.detail.value;
+          log.textContent = `px-dropdown-change: ${event.detail.value}`;
+        });
+
+      const confirmQuit = document.getElementById('confirm');
+      document.getElementById('quit').addEventListener('click', () => confirmQuit.show());
+      for (const button of confirmQuit.querySelectorAll('[data-answer]')) {
+        button.addEventListener('click', () => confirmQuit.close(button.dataset.answer));
+      }
+      confirmQuit.addEventListener('px-dialog-close', (event) => {
+        log.textContent = `px-dialog-close: ${event.detail.returnValue || 'dismissed'}`;
+      });
+
+      const loading = document.getElementById('loading');
+      const playerName = document.getElementById('player-name');
+      playerName.addEventListener('px-input-change', (event) => {
+        log.textContent = `px-input-change: ${event.detail.value || '(empty)'}`;
+      });
+      document.getElementById('start').addEventListener('click', () => {
+        // Already going: let it finish rather than starting over.
+        if (loading.value > 0 && loading.value < 100) return;
+        loading.value = 0;
+        const step = () => {
+          loading.value = Math.min(100, loading.value + 10);
+          if (loading.value < 100) {
+            setTimeout(step, 120);
+            return;
+          }
+          toasts.toast(`Welcome, ${playerName.value || 'nameless one'}`, { variant: 'success' });
+        };
+        setTimeout(step, 120);
+      });
+
+      // The segmented control drives the dialogue box's typing speed.
+      const speeds = { slow: 12, normal: 30, fast: 90 };
+      document.getElementById('speed').addEventListener('px-segmented-change', (event) => {
+        dialogue.speed = speeds[event.detail.value];
+        dialogue.restart();
+        log.textContent = `px-segmented-change: ${event.detail.value}`;
+      });
+
+      // Every line the old man finishes goes into the quest log, which scrolls
+      // itself to the bottom as it grows.
+      const questLog = document.getElementById('quest-log');
+      dialogue.addEventListener('px-dialogue-advance', () => {
+        const line = document.createElement('p');
+        line.style.margin = '0 0 12px';
+        line.textContent = `"${dialogue.text}" — ${dialogue.speaker}`;
+        questLog.append(line);
+        questLog.scrollToBottom();
+      });
+
+      // The shop ties the stepper, the counter and the inventory together.
+      const gold = document.getElementById('gold');
+      const quantity = document.getElementById('buy-potions');
+      const potionSlot = document.querySelector('px-inventory-slot[label="Potion"]');
+      document.getElementById('buy').addEventListener('click', () => {
+        const count = quantity.value;
+        if (count < 1) {
+          toasts.toast('Pick a quantity first.', { variant: 'info' });
+          return;
+        }
+
+        const cost = count * 20;
+        if (cost > gold.value) {
+          toasts.toast(`Not enough gold: ${cost}g needed.`, { variant: 'danger' });
+          return;
+        }
+
+        gold.value -= cost;
+        potionSlot.count += count;
+        toasts.toast(`Bought ${count} potion${count === 1 ? '' : 's'} for ${cost}g`, {
+          variant: 'success',
+        });
+      });
+
+      // A six-frame spinning coin, built here so the page needs no art files.
+      const coinWidths = [10, 8, 6, 2, 6, 8];
+      const coinSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="16" shape-rendering="crispEdges">${coinWidths
+        .map(
+          (width, i) =>
+            `<rect x="${i * 16 + (16 - width) / 2}" y="3" width="${width}" height="10" fill="#ffcd75"/>`,
+        )
+        .join('')}</svg>`;
+      document.getElementById('coin').src = `data:image/svg+xml,${encodeURIComponent(coinSvg)}`;
+
+      const boss = document.getElementById('boss');
+      const hero = document.getElementById('hero');
+      document.getElementById('fight').addEventListener('click', () => {
+        hero.status = 'ok';
+        hero.statusLabel = 'Healthy';
+        hp.value = 80;
+        boss.reset(15);
+        boss.start();
+      });
+      boss.addEventListener('px-timer-warn', () => {
+        hero.status = 'warn';
+        hero.statusLabel = 'In danger';
+        toasts.toast('The boss is winding up!', { variant: 'info' });
+      });
+      boss.addEventListener('px-timer-end', () => {
+        hero.status = 'danger';
+        hero.statusLabel = 'Down';
+        hp.value = 0;
+        toasts.toast('Enraged. You did not survive.', { variant: 'danger' });
+      });
+
+      // The character the player builds becomes the save in slot 1, so the
+      // two screens are the same character seen twice.
+      const look = document.getElementById('hero-look');
+      const heroName = document.getElementById('hero-name');
+
+      look.addEventListener('px-character-change', (event) => {
+        log.textContent = `px-character-change: ${event.detail.hairName}, ${event.detail.hairColorName}`;
+      });
+      document.getElementById('reroll').addEventListener('click', () => look.randomize());
+
+      document.getElementById('begin').addEventListener('click', () => {
+        const slot = document.querySelector('px-save-slot');
+        slot.name = heroName.value || 'Nameless';
+        slot.location = 'Bedroom';
+        slot.level = 1;
+        slot.playtime = 0;
+        slot.saved = 'Just now';
+
+        // The sprite's skin and clothes are classed, and the rules for those
+        // classes live in the creator's shadow root — which a clone does not
+        // take with it. So bake the colours in before moving it.
+        const sprite = look.shadowRoot.querySelector('[role="img"] svg');
+        const copy = sprite.cloneNode(true);
+        const source = sprite.querySelectorAll('rect');
+        copy.querySelectorAll('rect').forEach((rect, index) => {
+          rect.setAttribute('fill', getComputedStyle(source[index]).fill);
+          rect.removeAttribute('class');
+        });
+        slot.replaceChildren(copy);
+        toasts.toast(`${slot.name} begins.`, { variant: 'success' });
+      });
+
+      // The load screen: pick a slot, wait, then say how it went. The warning
+      // follows whichever slot is chosen rather than sitting there regardless.
+      const slots = [...document.querySelectorAll('px-save-slot')];
+      const saveNotice = document.getElementById('save-notice');
+      const loadingRow = document.getElementById('loading-row');
+      const loadResult = document.getElementById('load-result');
+      const loadButton = document.getElementById('load');
+
+      const chosen = () => slots.find((slot) => slot.selected);
+      const describeChoice = () => {
+        const slot = chosen();
+        saveNotice.hidden = !slot || slot.slotNumber !== 2;
+        loadButton.disabled = !slot || slot.empty;
+      };
+
+      document.getElementById('slots').addEventListener('px-save-slot-select', (event) => {
+        for (const slot of slots) slot.selected = slot === event.target;
+        log.textContent = `px-save-slot-select: slot ${event.detail.slotNumber}${
+          event.detail.empty ? ' (empty)' : ''
+        }`;
+        describeChoice();
+      });
+      describeChoice();
+
+      loadButton.addEventListener('click', () => {
+        const slot = chosen();
+        if (!slot || slot.empty) return;
+
+        loadResult.replaceChildren();
+        loadingRow.hidden = false;
+        loadButton.disabled = true;
+
+        setTimeout(() => {
+          loadingRow.hidden = true;
+          loadButton.disabled = false;
+
+          // Built and inserted rather than un-hidden: a live region announces
+          // when it arrives, which is the whole reason this one is live.
+          const notice = document.createElement('px-notice');
+          notice.variant = 'success';
+          notice.live = 'polite';
+          notice.dismissible = true;
+          notice.heading = `Slot ${slot.slotNumber} loaded`;
+          notice.textContent = `${slot.name}, ${slot.location}. ${slot.playtimeText} played.`;
+          loadResult.append(notice);
+          notice.addEventListener('px-notice-dismiss', () => notice.remove());
+        }, 1200);
+      });
+
+      // A parent box that reports how much of its list is ticked, which is the
+      // whole reason indeterminate exists.
+      const modsAll = document.getElementById('mods-all');
+      const modCount = document.getElementById('mod-count');
+      const mods = [...document.querySelectorAll('[data-mod]')];
+      const syncMods = () => {
+        const on = mods.filter((mod) => mod.checked).length;
+        modsAll.checked = on > 0;
+        modsAll.indeterminate = on > 0 && on < mods.length;
+        modCount.textContent = String(on);
+        modCount.variant = on === mods.length ? 'success' : 'xp';
+      };
+      modsAll.addEventListener('px-checkbox-change', (event) => {
+        for (const mod of mods) mod.checked = event.detail.checked;
+        syncMods();
+      });
+      for (const mod of mods) mod.addEventListener('px-checkbox-change', syncMods);
+      syncMods();
+
+      document.getElementById('sword-rating').addEventListener('px-rating-change', (event) => {
+        const { value, max } = event.detail;
+        log.textContent = `px-rating-change: ${value} of ${max}`;
+        if (value === max) toasts.toast('The old man would be pleased.', { variant: 'success' });
+      });
+
+      document.getElementById('theme').addEventListener('click', () => {
+        const root = document.documentElement;
+        root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      });
+    </script>
+  </body>
+</html>

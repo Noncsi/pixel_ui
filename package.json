@@ -1,0 +1,72 @@
+{
+  "name": "@noncsi/pixel-ui",
+  "version": "0.1.0",
+  "description": "A pixel-art game UI kit built as framework-agnostic Web Components with Lit.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Noncsi/pixel_ui.git"
+  },
+  "homepage": "https://noncsi.github.io/pixel_ui/",
+  "bugs": {
+    "url": "https://github.com/Noncsi/pixel_ui/issues"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "./dist/pixel-ui.js",
+  "module": "./dist/pixel-ui.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/pixel-ui.js"
+    },
+    "./tokens.css": "./dist/tokens.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/pixel-ui.js",
+    "./src/**",
+    "*.css"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "site": "vite --config vite.site.config.ts",
+    "build:site": "vite build --config vite.site.config.ts && node scripts/verify-site-build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "dependencies": {
+    "lit": "^3.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@storybook/addon-a11y": "^10.6.7",
+    "@storybook/addon-docs": "^10.6.7",
+    "@storybook/web-components-vite": "^10.6.7",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-storybook": "^10.6.7",
+    "happy-dom": "^21.0.4",
+    "prettier": "^3.9.10",
+    "storybook": "^10.6.7",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
