@@ -13,6 +13,8 @@ screens built from the kit, or
 **[every component on its own](https://noncsi.github.io/pixel_ui/storybook/)**
 in Storybook.
 
+[![The showcase site, with the screen list on the left and the field HUD in the middle: a party panel with HP, mana and XP bars, a bag of items, and the list of components the screen uses underneath](docs/screenshots/showcase.png)](https://noncsi.github.io/pixel_ui/)
+
 ```html
 <link rel="stylesheet" href="@noncsi/pixel-ui/tokens.css" />
 <script type="module">
@@ -40,6 +42,13 @@ Two tokens are worth knowing when re-theming: `--px-color-highlight` is the
 focus ring — and `--px-color-accent` is the positive/"on" colour the toggle and
 the slider fill use. Both get a value of their own under `data-theme="light"`,
 because the gold that reads on a dark panel disappears on a light one.
+
+| Dark, the default                                                                                                                        | The same screen under `data-theme="light"`                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![A game title screen in the dark theme: a main menu with New Game selected in gold, over a deep navy panel](docs/screenshots/title.png) | ![The identical title screen in the light theme, the same layout in slate on off-white with the selected row in plum](docs/screenshots/title-light.png) |
+
+Nothing in the markup changes between those two. One attribute moves, and every
+component picks up the new values because none of them hard-codes a colour.
 
 ## Getting started
 
@@ -81,6 +90,10 @@ shop and an options menu — each built from the kit and nothing else. The site'
 own CSS does layout only; every pixel of the look comes from the components,
 which is the claim it is making and would be a lie if the frame were doing the
 work.
+
+| Character creation                                                                                                                                          | Dialogue                                                                                                                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ![The character creation screen: a name field, a 16×16 pixel portrait, ten hair styles and twenty hair colours to choose from](docs/screenshots/create.png) | ![The dialogue screen: a speech bubble over a portrait, a dialogue box that has finished typing its line, and a slow/normal/fast speed control](docs/screenshots/dialogue.png) |
 
 Under each screen is a row of chips naming every component on it. Those chips
 are not a comment hoping to stay true: `test/site.test.ts` renders every
@@ -1391,6 +1404,6 @@ const stop = onGamepadAction((action) => {
 - [x] Spinner, inline notice, save slot
 - [x] Character creator, with its own pixel art
 - [x] A showcase site of finished screens, with a test that keeps it honest
-- [ ] Showcase and Storybook deployed to GitHub Pages
+- [x] Showcase and Storybook deployed to GitHub Pages
 - [ ] Published to npm with a changelog
 - [ ] Used in a real game
